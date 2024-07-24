@@ -5,30 +5,35 @@ import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.PluginMessageEvent;
 import com.velocitypowered.api.event.player.ServerConnectedEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
+import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
-import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
+import com.velocitypowered.api.proxy.server.RegisteredServer;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Timer;
 import java.util.TimerTask;
-import net.md_5.bungee.api.plugin.Listener;
 import org.geysermc.connector.GeyserConnector;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.floodgate.api.FloodgateApi;
 import org.slf4j.Logger;
 
 @Plugin(
-        id = "CompatNoCheatPlus", name = "My First Plugin",
-        url = "https://github.com/Currypan1229/CompatNoCheatPlus", authors = {"asofold", "xaw3ep", "Currypan1229"}
+        id = "compatnocheatplus", name = "CompatNoCheatPlus", version = "6.7.0-SNAPSHOT",
+        url = "https://github.com/Currypan1229/CompatNoCheatPlus", authors = {"asofold", "xaw3ep", "Currypan1229"},
+        dependencies = {
+                @Dependency(id = "floodgate"),
+                @Dependency(id = "geyser")
+        }
 )
-public class VelocityCompatNoCheatPlus implements Listener {
+public class VelocityCompatNoCheatPlus {
     public static final MinecraftChannelIdentifier IDENTIFIER = MinecraftChannelIdentifier.from("cncp:geyser");
+
     private final ProxyServer server;
     private final Logger logger;
     private final Path dataDirectory;
@@ -49,10 +54,10 @@ public class VelocityCompatNoCheatPlus implements Listener {
         this.geyser = this.checkGeyser();
         this.floodgate = this.checkFloodgate();
 
-        logger.info("Registering listeners");
-        this.server.getEventManager().register(this, this);
-        server.getChannelRegistrar().register(IDENTIFIER);
-        logger.info("cncp Bungee mode with Geyser : " + this.geyser + ", Floodgate : " + this.floodgate);
+        this.logger.info("Registering listeners");
+        //this.server.getEventManager().register(this, this);
+        this.server.getChannelRegistrar().register(IDENTIFIER);
+        this.logger.info("cncp Bungee mode with Geyser : " + this.geyser + ", Floodgate : " + this.floodgate);
     }
 
     private boolean checkFloodgate() {
@@ -60,7 +65,7 @@ public class VelocityCompatNoCheatPlus implements Listener {
     }
 
     private boolean checkGeyser() {
-        return this.server.getPluginManager().getPlugin("Geyser-Velocity").isPresent();
+        return this.server.getPluginManager().getPlugin("geyser").isPresent();
     }
 
     @Subscribe
@@ -76,7 +81,7 @@ public class VelocityCompatNoCheatPlus implements Listener {
     @Subscribe
     public void onChangeServer(final ServerConnectedEvent event) {
         final Player player = event.getPlayer();
-        final ServerConnection server = player.getCurrentServer().get();
+        final RegisteredServer server = event.getServer();
 
         if (!this.isBedrockPlayer(player)) return;
 
