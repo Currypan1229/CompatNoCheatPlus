@@ -1,18 +1,19 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>CompatNoCheatPlus</groupId>
-  <artifactId>CompatNoCheatPlus</artifactId>
-  <version>6.6.7-SNAPSHOT</version>
-  <name>CompatNoCheatPlus</name>
-  
-  
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>CompatNoCheatPlus</groupId>
+    <artifactId>CompatNoCheatPlus</artifactId>
+    <version>6.6.7-SNAPSHOT</version>
+    <name>CompatNoCheatPlus</name>
+
+
     <!-- Source code -->
     <scm>
         <developerConnection>scm:git:git@github.com:Updated-NoCheatPlus/${project.name}.git</developerConnection>
         <connection>scm:git:git://github.com/Updated-NoCheatPlus/${project.name}.git</connection>
         <url>https://github.com/Updated-NoCheatPlus/${project.name}</url>
     </scm>
-    
+
     <!-- Repositories -->
     <repositories>
         <!-- GeyesrMC -->
@@ -45,77 +46,87 @@
             <id>nms-repo</id>
             <url>https://repo.codemc.io/repository/nms/</url>
         </repository>
+        <!-- Velocity -->
+        <repository>
+            <id>papermc-repo</id>
+            <url>https://repo.papermc.io/repository/maven-public/</url>
+        </repository>
     </repositories>
 
     <!-- Dependencies -->
     <dependencies>
         <dependency>
-          <groupId>org.spigotmc</groupId>
-          <artifactId>spigot</artifactId>
-          <version>1.8.8-R0.1-SNAPSHOT</version>
-          <scope>provided</scope>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot</artifactId>
+            <version>1.8.8-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
-       <dependency>
-          <groupId>com.gmail.nossr50.mcMMO</groupId>
-          <artifactId>mcMMO</artifactId>
-          <version>2.1.226-SNAPSHOT</version>
-          <scope>system</scope>
-          <systemPath>${basedir}/libs/mcMMO.jar</systemPath>
-       </dependency>
-       <dependency>
-          <groupId>net.citizensnpcs</groupId>
-          <artifactId>citizensapi</artifactId>
-          <version>2.0.33-SNAPSHOT</version>
-          <scope>provided</scope>
-       </dependency>
-       <dependency>
-          <groupId>com.benzoft.gravitytubes</groupId>
-          <artifactId>gravitytubes</artifactId>
-          <version>1.11.4</version>
-          <scope>system</scope>
-          <systemPath>${basedir}/libs/GravityTubes.jar</systemPath>
-       </dependency>
-       <dependency>
-          <groupId>com.Zrips.CMI</groupId>
-          <artifactId>CMI</artifactId>
-          <version>9.5.0.8</version>
-          <scope>system</scope>
-          <systemPath>${basedir}/libs/CMI-API9.6.5.0.jar</systemPath>
-       </dependency>
-       <dependency>
-	      <groupId>fr.neaetmonster.nocheatplus</groupId>
-	      <artifactId>nocheatplus</artifactId>
-	      <version>3.17.1-SNAPSHOT-Updated-2023_12_11-17_11</version>
-          <systemPath>${basedir}/libs/NoCheatPlus.jar</systemPath>
-          <scope>system</scope>
-       </dependency>
-       <dependency>
-          <groupId>org.geysermc</groupId>
-          <artifactId>connector</artifactId>
-          <version>1.4.3-SNAPSHOT</version>
-          <scope>provided</scope>
-       </dependency>
-       <dependency>
-          <groupId>org.geysermc.floodgate</groupId>
-          <artifactId>api</artifactId>
-           <version>2.2.2-SNAPSHOT</version>
-          <scope>provided</scope>
-       </dependency>
-       <dependency>
-          <groupId>net.md-5</groupId>
-          <artifactId>bungeecord-api</artifactId>
-          <version>1.20-R0.1-SNAPSHOT</version>
-       </dependency>
-       <dependency>
-           <groupId>com.viaversion</groupId>
-           <artifactId>viaversion-api</artifactId>
-           <version>5.0.1</version>
-       </dependency>
-       <dependency>
-          <groupId>net.md-5</groupId>
-          <artifactId>bungeecord-event</artifactId>
-          <version>1.20-R0.1-SNAPSHOT</version>
-       </dependency>
+        <dependency>
+            <groupId>com.gmail.nossr50.mcMMO</groupId>
+            <artifactId>mcMMO</artifactId>
+            <version>2.1.226-SNAPSHOT</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/libs/mcMMO.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>net.citizensnpcs</groupId>
+            <artifactId>citizensapi</artifactId>
+            <version>2.0.33-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.benzoft.gravitytubes</groupId>
+            <artifactId>gravitytubes</artifactId>
+            <version>1.11.4</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/libs/GravityTubes.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.Zrips.CMI</groupId>
+            <artifactId>CMI</artifactId>
+            <version>9.5.0.8</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/libs/CMI-API9.6.5.0.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>fr.neaetmonster.nocheatplus</groupId>
+            <artifactId>nocheatplus</artifactId>
+            <version>3.17.1-SNAPSHOT-Updated-2023_12_11-17_11</version>
+            <systemPath>${basedir}/libs/NoCheatPlus.jar</systemPath>
+            <scope>system</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.geysermc</groupId>
+            <artifactId>connector</artifactId>
+            <version>1.4.3-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.geysermc.floodgate</groupId>
+            <artifactId>api</artifactId>
+            <version>2.2.2-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.md-5</groupId>
+            <artifactId>bungeecord-api</artifactId>
+            <version>1.20-R0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.viaversion</groupId>
+            <artifactId>viaversion-api</artifactId>
+            <version>5.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>net.md-5</groupId>
+            <artifactId>bungeecord-event</artifactId>
+            <version>1.20-R0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.velocitypowered</groupId>
+            <artifactId>velocity-api</artifactId>
+            <version>3.2.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <!-- Build Description Profiles -->
@@ -188,10 +199,10 @@
             </plugin>
         </plugins>
     </build>
-  
-   <!-- Properties -->
-   <properties>
-       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-       <maven.build.timestamp.format>yyyy_MM_dd-HH_mm</maven.build.timestamp.format>
-   </properties>
+
+    <!-- Properties -->
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.build.timestamp.format>yyyy_MM_dd-HH_mm</maven.build.timestamp.format>
+    </properties>
 </project>
