@@ -27,7 +27,7 @@ import org.slf4j.Logger;
         id = "CompatNoCheatPlus", name = "My First Plugin",
         url = "https://github.com/Currypan1229/CompatNoCheatPlus", authors = {"asofold", "xaw3ep", "Currypan1229"}
 )
-public class VelocityCompatNoCheatPlus extends net.md_5.bungee.api.plugin.Plugin implements Listener {
+public class VelocityCompatNoCheatPlus implements Listener {
     public static final MinecraftChannelIdentifier IDENTIFIER = MinecraftChannelIdentifier.from("cncp:geyser");
     private final ProxyServer server;
     private final Logger logger;
@@ -46,19 +46,13 @@ public class VelocityCompatNoCheatPlus extends net.md_5.bungee.api.plugin.Plugin
 
     @Subscribe
     public void onProxyInitialization(final ProxyInitializeEvent event) {
-        // Do some operation demanding access to the Velocity API here.
-        // For instance, we could register an event:
-        this.server.getEventManager().register(this, this);
-    }
-
-    @Override
-    public void onEnable() {
         this.geyser = this.checkGeyser();
         this.floodgate = this.checkFloodgate();
-        this.getLogger().info("Registering listeners");
-        this.getProxy().getPluginManager().registerListener(this, this);
-        this.getProxy().registerChannel("cncp:geyser");
-        this.getLogger().info("cncp Bungee mode with Geyser : " + this.geyser + ", Floodgate : " + this.floodgate);
+
+        logger.info("Registering listeners");
+        this.server.getEventManager().register(this, this);
+        server.getChannelRegistrar().register(IDENTIFIER);
+        logger.info("cncp Bungee mode with Geyser : " + this.geyser + ", Floodgate : " + this.floodgate);
     }
 
     private boolean checkFloodgate() {
@@ -72,7 +66,7 @@ public class VelocityCompatNoCheatPlus extends net.md_5.bungee.api.plugin.Plugin
     @Subscribe
     public void onMessageReceive(final PluginMessageEvent event) {
         if (event.getIdentifier().equals(IDENTIFIER)) {
-            // Message sent from client, cancel it
+            // Message sent from clients, cancel it
             if (event.getSource() instanceof Player) {
                 event.setResult(PluginMessageEvent.ForwardResult.handled());
             }
