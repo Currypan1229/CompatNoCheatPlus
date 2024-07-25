@@ -26,6 +26,7 @@ import me.asofold.bpl.cncp.hooks.generic.HookEntityDamageByEntity;
 import me.asofold.bpl.cncp.hooks.generic.HookInstaBreak;
 import me.asofold.bpl.cncp.hooks.generic.HookPlayerClass;
 import me.asofold.bpl.cncp.hooks.generic.HookPlayerInteract;
+import me.asofold.bpl.cncp.proxy.WProxyCompatNoCheatPlus;
 import me.asofold.bpl.cncp.utils.TickTask2;
 import me.asofold.bpl.cncp.utils.Utils;
 import org.bukkit.Bukkit;
@@ -49,11 +50,11 @@ import org.bukkit.scheduler.BukkitScheduler;
  *
  * @author mc_dev
  */
-public class CompatNoCheatPlus extends JavaPlugin implements Listener {
+public class BukkitCompatNoCheatPlus extends JavaPlugin implements Listener {
 
     /** Hooks registered with cncp */
     private static final Set<Hook> registeredHooks = new HashSet<>();
-    private static CompatNoCheatPlus instance = null;
+    private static BukkitCompatNoCheatPlus instance = null;
     /**
      * Flag if plugin is enabled.
      */
@@ -92,7 +93,7 @@ public class CompatNoCheatPlus extends JavaPlugin implements Listener {
      *
      * @return
      */
-    public static CompatNoCheatPlus getInstance() {
+    public static BukkitCompatNoCheatPlus getInstance() {
         return instance;
     }
 
@@ -165,7 +166,7 @@ public class CompatNoCheatPlus extends JavaPlugin implements Listener {
         this.unregisterNCPHooks(); // Just in case.
         enabled = false;
         instance = null; // Set last.
-        this.getServer().getMessenger().unregisterIncomingPluginChannel(this, "cncp:geyser");
+        this.getServer().getMessenger().unregisterIncomingPluginChannel(this, WProxyCompatNoCheatPlus.IDENTIFIER);
         super.onDisable();
     }
 
@@ -183,7 +184,8 @@ public class CompatNoCheatPlus extends JavaPlugin implements Listener {
         final PluginManager pm = this.getServer().getPluginManager();
         pm.registerEvents(this, this);
         pm.registerEvents(new BedrockPlayerListener(), this);
-        this.getServer().getMessenger().registerIncomingPluginChannel(this, "cncp:geyser", new BedrockPlayerListener());
+        this.getServer().getMessenger().registerIncomingPluginChannel(this, WProxyCompatNoCheatPlus.IDENTIFIER,
+                new BedrockPlayerListener());
         try {
             this.proxy = this.getServer().spigot().getConfig().getBoolean("settings.bungeecord");
 
@@ -381,7 +383,7 @@ public class CompatNoCheatPlus extends JavaPlugin implements Listener {
         final Logger logger = server.getLogger();
         for (final String plgName : this.settings.loadPlugins) {
             try {
-                if (CompatNoCheatPlus.enablePlugin(plgName)) {
+                if (BukkitCompatNoCheatPlus.enablePlugin(plgName)) {
                     System.out.println("[CompatNoCheatPlus] Ensured that the following plugin is enabled: " + plgName);
                 }
             } catch (final Throwable t) {

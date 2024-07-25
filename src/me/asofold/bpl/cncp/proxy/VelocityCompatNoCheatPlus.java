@@ -18,9 +18,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Timer;
 import java.util.TimerTask;
-import org.geysermc.connector.GeyserConnector;
-import org.geysermc.connector.network.session.GeyserSession;
-import org.geysermc.floodgate.api.FloodgateApi;
 import org.slf4j.Logger;
 
 @Plugin(
@@ -31,14 +28,13 @@ import org.slf4j.Logger;
                 @Dependency(id = "geyser")
         }
 )
-public class VelocityCompatNoCheatPlus {
-    public static final MinecraftChannelIdentifier IDENTIFIER = MinecraftChannelIdentifier.from("cncp:geyser");
-
+public final class VelocityCompatNoCheatPlus {
+    public static final MinecraftChannelIdentifier IDENTIFIER =
+            MinecraftChannelIdentifier.from(WProxyCompatNoCheatPlus.IDENTIFIER);
+    private final WProxyCompatNoCheatPlus wrapper;
     private final ProxyServer server;
     private final Logger logger;
     private final Path dataDirectory;
-    private boolean floodgate;
-    private boolean geyser;
 
     @Inject
     public VelocityCompatNoCheatPlus(final ProxyServer server, final Logger logger,
@@ -47,17 +43,15 @@ public class VelocityCompatNoCheatPlus {
         this.logger = logger;
         this.dataDirectory = dataDirectory;
 
+        this.wrapper = new WVeclotityCompatNoCheatPlus(server);
     }
 
     @Subscribe
     public void onProxyInitialization(final ProxyInitializeEvent event) {
-        this.geyser = this.checkGeyser();
-        this.floodgate = this.checkFloodgate();
-
         this.logger.info("Registering listeners");
         //this.server.getEventManager().register(this, this);
         this.server.getChannelRegistrar().register(IDENTIFIER);
-        this.logger.info("cncp Bungee mode with Geyser : " + this.geyser + ", Floodgate : " + this.floodgate);
+        this.logger.info("cncp Bungee mode with Geyser : " + this.wrapper.geyser + ", Floodgate : " + this.wrapper.floodGate);
     }
 
     private boolean checkFloodgate() {
@@ -83,7 +77,7 @@ public class VelocityCompatNoCheatPlus {
         final Player player = event.getPlayer();
         final RegisteredServer server = event.getServer();
 
-        if (!this.isBedrockPlayer(player)) return;
+        if (!this.wrapper.isBedrockPlayer(player.getUniqueId())) return;
 
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         final DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
@@ -101,20 +95,5 @@ public class VelocityCompatNoCheatPlus {
         };
         final Timer timer = new Timer(false);
         timer.schedule(t, 0, 1000);
-    }
-
-    private boolean isBedrockPlayer(final Player player) {
-        if (this.floodgate) {
-            return FloodgateApi.getInstance().isFloodgatePlayer(player.getUniqueId());
-        }
-        if (this.geyser) {
-            try {
-                final GeyserSession session = GeyserConnector.getInstance().getPlayerByUuid(player.getUniqueId());
-                return session != null;
-            } catch (final NullPointerException e) {
-                return false;
-            }
-        }
-        return false;
     }
 }
