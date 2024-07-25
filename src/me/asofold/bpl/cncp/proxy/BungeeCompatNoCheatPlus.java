@@ -30,7 +30,7 @@ public final class BungeeCompatNoCheatPlus extends Plugin implements Listener {
     @EventHandler
     public void onMessageReceive(final PluginMessageEvent event) {
         if (event.getTag().equalsIgnoreCase(WProxyCompatNoCheatPlus.IDENTIFIER)) {
-            // Message sent from client, cancel it
+            // Message sent from clients, cancel it
             if (event.getSender() instanceof ProxiedPlayer) {
                 event.setCancelled(true);
             }
