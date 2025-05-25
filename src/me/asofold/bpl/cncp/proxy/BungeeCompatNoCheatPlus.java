@@ -1,12 +1,8 @@
-package me.asofold.bpl.cncp.bungee;
+package me.asofold.bpl.cncp.proxy;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
-
-import org.geysermc.connector.GeyserConnector;
-import org.geysermc.connector.network.session.GeyserSession;
-import org.geysermc.floodgate.api.FloodgateApi;
 
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -16,15 +12,15 @@ import net.md_5.bungee.api.event.ServerSwitchEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;
+import me.asofold.bpl.cncp.utils.GeyserUtils;
 
-public class CompatNoCheatPlus extends Plugin implements Listener {
-    private boolean floodgate;
-    private boolean geyser;
-
+public class BungeeCompatNoCheatPlus extends Plugin implements Listener {
     @Override
     public void onEnable() {
-        geyser = checkGeyser();
-        floodgate = checkFloodgate();
+        final boolean geyser = checkGeyser();
+        final boolean floodgate = checkFloodgate();
+        GeyserUtils.init(floodgate, geyser);
+
         getLogger().info("Registering listeners");
         getProxy().getPluginManager().registerListener(this, this);
         getProxy().registerChannel("cncp:geyser");
@@ -49,27 +45,12 @@ public class CompatNoCheatPlus extends Plugin implements Listener {
         return ProxyServer.getInstance().getPluginManager().getPlugin("Geyser-BungeeCord") != null;
     }
 
-    private boolean isBedrockPlayer(ProxiedPlayer player) {
-        if (floodgate) {
-            return FloodgateApi.getInstance().isFloodgatePlayer(player.getUniqueId());
-        }
-        if (geyser) {
-            try {
-                GeyserSession session = GeyserConnector.getInstance().getPlayerByUuid(player.getUniqueId());
-                return session != null;
-            } catch (NullPointerException e) {
-                return false;
-            }
-        }
-        return false;
-    }
-
     @EventHandler
     public void onChangeServer(ServerSwitchEvent event) {
         ProxiedPlayer player = event.getPlayer();
         Server server = player.getServer();
 
-        if (!isBedrockPlayer(player)) return;
+        if (!GeyserUtils.isBedrockPlayer(player.getUniqueId())) return;
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
