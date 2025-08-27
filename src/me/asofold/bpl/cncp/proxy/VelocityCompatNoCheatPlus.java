@@ -1,0 +1,99 @@
+package me.asofold.bpl.cncp.proxy;
+
+import com.google.inject.Inject;
+import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.connection.PluginMessageEvent;
+import com.velocitypowered.api.event.player.ServerConnectedEvent;
+import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
+import com.velocitypowered.api.plugin.Dependency;
+import com.velocitypowered.api.plugin.Plugin;
+import com.velocitypowered.api.plugin.annotation.DataDirectory;
+import com.velocitypowered.api.proxy.Player;
+import com.velocitypowered.api.proxy.ProxyServer;
+import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
+import com.velocitypowered.api.proxy.server.RegisteredServer;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Timer;
+import java.util.TimerTask;
+import org.slf4j.Logger;
+
+@Plugin(
+        id = "compatnocheatplus", name = "CompatNoCheatPlus", version = "6.7.0-SNAPSHOT",
+        url = "https://github.com/Currypan1229/CompatNoCheatPlus", authors = {"asofold", "xaw3ep", "Currypan1229"},
+        dependencies = {
+                @Dependency(id = "floodgate"),
+                @Dependency(id = "geyser")
+        }
+)
+public final class VelocityCompatNoCheatPlus {
+    public static final MinecraftChannelIdentifier IDENTIFIER =
+            MinecraftChannelIdentifier.from(WProxyCompatNoCheatPlus.IDENTIFIER);
+    private final WProxyCompatNoCheatPlus wrapper;
+    private final ProxyServer server;
+    private final Logger logger;
+    private final Path dataDirectory;
+
+    @Inject
+    public VelocityCompatNoCheatPlus(final ProxyServer server, final Logger logger,
+                                     @DataDirectory final Path dataDirectory) {
+        this.server = server;
+        this.logger = logger;
+        this.dataDirectory = dataDirectory;
+
+        this.wrapper = new WVeclotityCompatNoCheatPlus(server);
+    }
+
+    @Subscribe
+    public void onProxyInitialization(final ProxyInitializeEvent event) {
+        this.logger.info("Registering listeners");
+        //this.server.getEventManager().register(this, this);
+        this.server.getChannelRegistrar().register(IDENTIFIER);
+        this.logger.info("cncp Bungee mode with Geyser : " + this.wrapper.geyser + ", Floodgate : " + this.wrapper.floodGate);
+    }
+
+    private boolean checkFloodgate() {
+        return this.server.getPluginManager().getPlugin("floodgate").isPresent();
+    }
+
+    private boolean checkGeyser() {
+        return this.server.getPluginManager().getPlugin("geyser").isPresent();
+    }
+
+    @Subscribe
+    public void onMessageReceive(final PluginMessageEvent event) {
+        if (event.getIdentifier().equals(IDENTIFIER)) {
+            // Message sent from clients, cancel it
+            if (event.getSource() instanceof Player) {
+                event.setResult(PluginMessageEvent.ForwardResult.handled());
+            }
+        }
+    }
+
+    @Subscribe
+    public void onChangeServer(final ServerConnectedEvent event) {
+        final Player player = event.getPlayer();
+        final RegisteredServer server = event.getServer();
+
+        if (!this.wrapper.isBedrockPlayer(player.getUniqueId())) return;
+
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        final DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
+        try {
+            dataOutputStream.writeUTF(player.getGameProfile().getName());
+        } catch (final IOException e) {
+            e.printStackTrace();
+        }
+
+        final TimerTask t = new TimerTask() {
+            @Override
+            public void run() {
+                server.sendPluginMessage(VelocityCompatNoCheatPlus.IDENTIFIER, outputStream.toByteArray());
+            }
+        };
+        final Timer timer = new Timer(false);
+        timer.schedule(t, 0, 1000);
+    }
+}

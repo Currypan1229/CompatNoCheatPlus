@@ -1,4 +1,4 @@
 name: CompatNoCheatPlus
-main: me.asofold.bpl.cncp.bungee.CompatNoCheatPlus
+main: me.asofold.bpl.cncp.proxy.CompatNoCheatPlus
 version: ${project.version}-${buildDescription}
 author: asofold, xaw3ep

@@ -1,16 +1,16 @@
 name: CompatNoCheatPlus
-main: me.asofold.bpl.cncp.CompatNoCheatPlus
+main: me.asofold.bpl.cncp.proxy.CompatNoCheatPlus
 version: ${project.version}-${buildDescription}
 dev-url: https://github.com/Updated-NoCheatPlus/CompatNoCheatPlus
 api-version: 1.13
 folia-supported: true
 
 loadbefore:
-- NoCheatPlus
+  - NoCheatPlus
 softdepend:
-- mcMMO
-- Citizens
-- MagicSpells
+  - mcMMO
+  - Citizens
+  - MagicSpells
 
 commands:
   compatnocheatplus:
@@ -18,4 +18,4 @@ commands:
     usage: '/<command>'
     permission: 'cncp.cmd.info'
     aliases:
-    - cncp
+      - cncp

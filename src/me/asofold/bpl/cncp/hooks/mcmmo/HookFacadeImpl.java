@@ -1,14 +1,5 @@
 package me.asofold.bpl.cncp.hooks.mcmmo;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.access.IViolationInfo;
 import fr.neatmonster.nocheatplus.compat.Bridge1_9;
@@ -18,12 +9,19 @@ import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties.ToolProps;
 import fr.neatmonster.nocheatplus.utilities.map.BlockProperties.ToolType;
-import me.asofold.bpl.cncp.CompatNoCheatPlus;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import me.asofold.bpl.cncp.BukkitCompatNoCheatPlus;
 import me.asofold.bpl.cncp.hooks.generic.ExemptionManager;
 import me.asofold.bpl.cncp.hooks.generic.HookInstaBreak;
 import me.asofold.bpl.cncp.hooks.mcmmo.HookmcMMO.HookFacade;
 import me.asofold.bpl.cncp.utils.ActionFrequency;
 import me.asofold.bpl.cncp.utils.TickTask2;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 @SuppressWarnings("deprecation")
 public class HookFacadeImpl implements HookFacade, NCPHook {
@@ -34,7 +32,7 @@ public class HookFacadeImpl implements HookFacade, NCPHook {
     /** Normal click per block skills. */
     protected final CheckType[] exemptBreakNormal = new CheckType[]{
             CheckType.BLOCKBREAK_FASTBREAK, CheckType.BLOCKBREAK_FREQUENCY,
-            CheckType.BLOCKBREAK_NOSWING, 
+            CheckType.BLOCKBREAK_NOSWING,
             CheckType.BLOCKBREAK_WRONGBLOCK, // Not optimal but ok.
     };
 
@@ -57,27 +55,24 @@ public class HookFacadeImpl implements HookFacade, NCPHook {
 
     protected final boolean useInstaBreakHook;
     protected final int clicksPerSecond;
-    protected String cancel = null;
-    protected long cancelTicks = 0;
-
     protected final Map<CheckType, Integer> cancelChecks = new HashMap<>();
-
     /**
      * Last block breaking time
      */
     protected final Map<String, ActionFrequency> lastBreak = new HashMap<>(50);
-
+    protected String cancel = null;
+    protected long cancelTicks = 0;
     /** Counter for nested events to cancel break counting. */
-    protected int breakCancel = 0; 
+    protected int breakCancel = 0;
 
     protected int lastBreakAddCount = 0;
     protected long lastBreakCleanup = 0;
 
-    public HookFacadeImpl(boolean useInstaBreakHook, int clicksPerSecond){
+    public HookFacadeImpl(final boolean useInstaBreakHook, final int clicksPerSecond) {
         this.useInstaBreakHook = useInstaBreakHook;
         this.clicksPerSecond = clicksPerSecond;
-        cancelChecksBlockBreak.put(CheckType.BLOCKBREAK_NOSWING, 1);
-        cancelChecksBlockBreak.put(CheckType.BLOCKBREAK_FASTBREAK, 1);
+        this.cancelChecksBlockBreak.put(CheckType.BLOCKBREAK_NOSWING, 1);
+        this.cancelChecksBlockBreak.put(CheckType.BLOCKBREAK_FASTBREAK, 1);
         //		
         //		cancelChecksBlockDamage.put(CheckType.BLOCKBREAK_FASTBREAK, 1);
         //		
@@ -99,154 +94,152 @@ public class HookFacadeImpl implements HookFacade, NCPHook {
     public final boolean onCheckFailure(final CheckType checkType, final Player player, final IViolationInfo info) {
         //		System.out.println(player.getName() + " -> " + checkType + "---------------------------");
         // Somewhat generic canceling mechanism (within the same tick).
-        // Might later fail, if block break event gets scheduled after block damage having set insta break, instead of letting them follow directly.
-        if (cancel == null){
+        // Might later fail, if block break event gets scheduled after block damage having set insta break, instead
+        // of letting them follow directly.
+        if (this.cancel == null) {
             return false;
         }
 
         final String name = player.getName();
-        if (cancel.equals(name)){
+        if (this.cancel.equals(name)) {
 
-            if (player.getTicksLived() != cancelTicks){
-                cancel = null;
-            }
-            else{
-                final Integer n = cancelChecks.get(checkType);
-                if (n == null){
+            if (player.getTicksLived() != this.cancelTicks) {
+                this.cancel = null;
+            } else {
+                final Integer n = this.cancelChecks.get(checkType);
+                if (n == null) {
                     return false;
-                }
-                else if (n > 0){
-                    if (n == 1) cancelChecks.remove(checkType);
-                    else cancelChecks.put(checkType,  n - 1);
+                } else if (n > 0) {
+                    if (n == 1) this.cancelChecks.remove(checkType);
+                    else this.cancelChecks.put(checkType, n - 1);
                 }
                 return true;
             }
         }
         return false;
-    }
-
-    private void setPlayer(final Player player, Map<CheckType, Integer> cancelChecks){
-        cancel = player.getName();
-        cancelTicks = player.getTicksLived();
-        this.cancelChecks.clear();
-        this.cancelChecks.putAll(cancelChecks);
-    }
-
-    public ToolProps getToolProps(final ItemStack stack){
-        if (stack == null) return BlockProperties.noTool;
-        else return BlockProperties.getToolProps(stack);
-    }
-
-    public void addExemption(final Player player, final CheckType[] types){
-        for (final CheckType type : types){
-            exMan.addExemption(player, type);
-            TickTask2.addUnexemptions(player, types);
-        }
-    }
-
-    public void removeExemption(final Player player, final CheckType[] types){
-        for (final CheckType type : types){
-            exMan.removeExemption(player, type);
-        }
     }
 
     @Override
     public final void damageLowest(final Player player) {
         //		System.out.println("damage lowest");
         //		setPlayer(player, cancelChecksDamage);
-        addExemption(player, exemptFightEffect);
+        this.addExemption(player, this.exemptFightEffect);
+    }
+
+    public void addExemption(final Player player, final CheckType[] types) {
+        for (final CheckType type : types) {
+            this.exMan.addExemption(player, type);
+            TickTask2.addUnexemptions(player, types);
+        }
+    }
+
+    @Override
+    public void damageMonitor(final Player player) {
+        //		System.out.println("damage monitor");
+        this.removeExemption(player, this.exemptFightEffect);
+    }
+
+    public void removeExemption(final Player player, final CheckType[] types) {
+        for (final CheckType type : types) {
+            this.exMan.removeExemption(player, type);
+        }
     }
 
     @Override
     public final void blockDamageLowest(final Player player) {
         //		System.out.println("block damage lowest");
         //		setPlayer(player, cancelChecksBlockDamage);
-        if (getToolProps(Bridge1_9.getItemInMainHand(player)).toolType == ToolType.AXE) addExemption(player, exemptBreakMany);
-        else addExemption(player, exemptBreakNormal);
+        if (this.getToolProps(Bridge1_9.getItemInMainHand(player)).toolType == ToolType.AXE)
+            this.addExemption(player, this.exemptBreakMany);
+        else this.addExemption(player, this.exemptBreakNormal);
+    }
+
+    public ToolProps getToolProps(final ItemStack stack) {
+        if (stack == null) return BlockProperties.noTool;
+        else return BlockProperties.getToolProps(stack);
+    }
+
+    @Override
+    public void blockDamageMonitor(final Player player) {
+        //		System.out.println("block damage monitor");
+        if (this.getToolProps(player.getItemInHand()).toolType == ToolType.AXE)
+            this.addExemption(player, this.exemptBreakMany);
+        else this.removeExemption(player, this.exemptBreakNormal);
     }
 
     @Override
     public final boolean blockBreakLowest(final Player player) {
         //		System.out.println("block break lowest");
-        final boolean isAxe = getToolProps(Bridge1_9.getItemInMainHand(player)).toolType == ToolType.AXE;
-        if (breakCancel > 0){
-            breakCancel ++;
+        final boolean isAxe = this.getToolProps(Bridge1_9.getItemInMainHand(player)).toolType == ToolType.AXE;
+        if (this.breakCancel > 0) {
+            this.breakCancel++;
             return true;
         }
         final String name = player.getName();
-        ActionFrequency freq = lastBreak.get(name);
+        ActionFrequency freq = this.lastBreak.get(name);
         final long now = System.currentTimeMillis();
-        if (freq == null){
+        if (freq == null) {
             freq = new ActionFrequency(3, 333);
             freq.add(now, 1f);
-            lastBreak.put(name, freq);
-            lastBreakAddCount ++;
-            if (lastBreakAddCount > 100){
-                lastBreakAddCount = 0;
-                cleanupLastBreaks();
+            this.lastBreak.put(name, freq);
+            this.lastBreakAddCount++;
+            if (this.lastBreakAddCount > 100) {
+                this.lastBreakAddCount = 0;
+                this.cleanupLastBreaks();
             }
-        }
-        else if (!isAxe){
+        } else if (!isAxe) {
             freq.add(now, 1f);
-            if (freq.score(1f) > (float) clicksPerSecond){
-                breakCancel ++;
+            if (freq.score(1f) > (float) this.clicksPerSecond) {
+                this.breakCancel++;
                 return true;
             }
         }
 
-        addExemption(player, exemptBreakNormal);
-        if (useInstaBreakHook){
-            HookInstaBreak.addExemptNext(exemptBreakNormal);
-            TickTask2.addUnexemptions(player, exemptBreakNormal);
-        }
-        else if (!isAxe){
-            setPlayer(player, cancelChecksBlockBreak);
-            Folia.runSyncTask(CompatNoCheatPlus.getInstance(), (arg) -> DataManager.removeData(player.getName(), CheckType.BLOCKBREAK_FASTBREAK));
+        this.addExemption(player, this.exemptBreakNormal);
+        if (this.useInstaBreakHook) {
+            HookInstaBreak.addExemptNext(this.exemptBreakNormal);
+            TickTask2.addUnexemptions(player, this.exemptBreakNormal);
+        } else if (!isAxe) {
+            this.setPlayer(player, this.cancelChecksBlockBreak);
+            Folia.runSyncTask(BukkitCompatNoCheatPlus.getInstance(), (arg) -> DataManager.removeData(player.getName()
+                    , CheckType.BLOCKBREAK_FASTBREAK));
         }
         return false;
     }
 
+    private void setPlayer(final Player player, final Map<CheckType, Integer> cancelChecks) {
+        this.cancel = player.getName();
+        this.cancelTicks = player.getTicksLived();
+        this.cancelChecks.clear();
+        this.cancelChecks.putAll(cancelChecks);
+    }
+
     protected void cleanupLastBreaks() {
         final long ts = System.currentTimeMillis();
-        if (ts - lastBreakCleanup < 30000 && ts > lastBreakCleanup) return;
-        lastBreakCleanup = ts;
+        if (ts - this.lastBreakCleanup < 30000 && ts > this.lastBreakCleanup) return;
+        this.lastBreakCleanup = ts;
         final List<String> rem = new LinkedList<>();
-        if (ts >= lastBreakCleanup){
-            for (final Entry<String, ActionFrequency> entry : lastBreak.entrySet()){
+        if (ts >= this.lastBreakCleanup) {
+            for (final Entry<String, ActionFrequency> entry : this.lastBreak.entrySet()) {
                 if (entry.getValue().score(1f) == 0f) rem.add(entry.getKey());
             }
+        } else {
+            rem.addAll(this.lastBreak.keySet());
         }
-        else{
-            rem.addAll(lastBreak.keySet());
-        }
-        for (final String key :rem){
-            lastBreak.remove(key);
+        for (final String key : rem) {
+            this.lastBreak.remove(key);
         }
     }
 
     @Override
-    public void damageMonitor(Player player) {
-        //		System.out.println("damage monitor");
-        removeExemption(player, exemptFightEffect);
-    }
-
-    @Override
-    public void blockDamageMonitor(Player player) {
-        //		System.out.println("block damage monitor");
-        if (getToolProps(player.getItemInHand()).toolType == ToolType.AXE) addExemption(player, exemptBreakMany);
-        else removeExemption(player, exemptBreakNormal);
-    }
-
-    @Override
-    public void blockBreakMontitor(Player player) {
-        if (breakCancel > 0){
-            breakCancel --;
+    public void blockBreakMontitor(final Player player) {
+        if (this.breakCancel > 0) {
+            this.breakCancel--;
             return;
         }
         //		System.out.println("block break monitor");
-        removeExemption(player, exemptBreakNormal);
+        this.removeExemption(player, this.exemptBreakNormal);
     }
-
 
 
 }
